@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -9,6 +10,8 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +28,7 @@ export default function LoginForm() {
       // });
       // const data = await response.json();
       // if (!response.ok) throw new Error(data.message);
-
+      await login(email, password);
       // For demonstration, we'll simulate a successful login
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -33,7 +36,7 @@ export default function LoginForm() {
       // localStorage.setItem('token', data.token);
 
       // Redirect to dashboard
-      router.push("/dashboard");
+      // router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
