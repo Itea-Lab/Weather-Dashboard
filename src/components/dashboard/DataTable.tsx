@@ -1,25 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-// Sample dataset type
-interface Dataset {
-  id: string;
-  lastUpdated: string;
-  category: string;
-  size: string;
-  rows: number;
-  columns: number;
-  avgWindSpeed: number;
-  maxWindSpeed: number;
-  WindDirection: number;
-  status: "active" | "processing" | "error";
-}
+import { Dataset } from "@/types/dataset";
 
 export default function DatasetTable() {
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(7);
   // State for data fetching
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,44 +38,8 @@ export default function DatasetTable() {
   const currentItems = datasets.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(datasets.length / itemsPerPage);
 
-  // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // Status badge component
-  const StatusBadge = ({ status }: { status: Dataset["status"] }) => {
-    let badgeClasses =
-      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
-
-    switch (status) {
-      case "active":
-        badgeClasses += " bg-green-100 text-green-800";
-        break;
-      case "processing":
-        badgeClasses += " bg-blue-100 text-blue-800";
-        break;
-      case "error":
-        badgeClasses += " bg-red-100 text-red-800";
-        break;
-      default:
-        badgeClasses += " bg-gray-100 text-gray-800";
-    }
-
-    return (
-      <span className={badgeClasses}>
-        {status === "active" && (
-          <span className="w-1.5 h-1.5 mr-1.5 bg-green-500 rounded-full"></span>
-        )}
-        {status === "processing" && (
-          <span className="w-1.5 h-1.5 mr-1.5 bg-blue-500 rounded-full"></span>
-        )}
-        {status === "error" && (
-          <span className="w-1.5 h-1.5 mr-1.5 bg-red-500 rounded-full"></span>
-        )}
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
-  };
-  // Handle loading and error states
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -158,7 +109,13 @@ export default function DatasetTable() {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Status
+                Rain Fall by Hour {"(mm)"}
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Rain Fall by Day {"(mm)"}
               </th>
               <th
                 scope="col"
@@ -175,35 +132,48 @@ export default function DatasetTable() {
                   <div className="flex items-center">
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {new Date(dataset.lastUpdated).toLocaleDateString()}
+                        {new Date(dataset.timestamp).toLocaleString()}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {dataset.category}
+                    {dataset.temperature}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{dataset.size}</div>
+                  <div className="text-sm text-gray-900">{dataset.humidity}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {dataset.rows.toLocaleString()} × {dataset.columns}
+                    {dataset.pressure}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{dataset.avgWindSpeed}</div>
+                  <div className="text-sm text-gray-900">
+                    {dataset.avgWindSpeed}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{dataset.maxWindSpeed}</div>
+                  <div className="text-sm text-gray-900">
+                    {dataset.maxWindSpeed}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{dataset.WindDirection}</div>
+                  <div className="text-sm text-gray-900">
+                    {dataset.windDirection}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge status={dataset.status} />
+                  <div className="text-sm text-gray-900">
+                    {dataset.rainFallbyHour}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {dataset.rainFallbyDay}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-3">
