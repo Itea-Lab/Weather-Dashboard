@@ -21,7 +21,7 @@ export default function Sidebar() {
   return (
     <aside className="bg-indigo-800 text-white w-64 min-h-screen p-4">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">ITea Edge Hub</h2>
+        <h2 className="text-2xl font-bold text-center">ITea Edge Hub</h2>
       </div>
 
       <div className="mb-6">
