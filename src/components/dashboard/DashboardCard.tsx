@@ -1,28 +1,31 @@
+import {
+  Thermometer,
+  Droplets,
+  Gauge,
+  ChartNoAxesCombined,
+} from "lucide-react";
+
 type DashboardCardProps = {
   title: string;
   value: string;
   icon: string;
-  trend: string;
-  trendDirection?: "up" | "down";
 };
 
 export default function DashboardCard({
   title,
   value,
   icon,
-  trend,
-  trendDirection = "up",
 }: DashboardCardProps) {
   const getIcon = () => {
     switch (icon) {
-      case "users":
-        return "👥";
-      case "dollar":
-        return "💰";
-      case "projects":
-        return "📁";
+      case "temperature":
+        return <Thermometer/>;
+      case "humidity":
+        return <Droplets/>;
+      case "barometric":
+        return <Gauge/>;
       default:
-        return "📊";
+        return <ChartNoAxesCombined/>;
     }
   };
 
@@ -35,13 +38,6 @@ export default function DashboardCard({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-2xl font-bold">{value}</p>
-          <p
-            className={`text-sm ${
-              trendDirection === "up" ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {trend} {trendDirection === "up" ? "↑" : "↓"}
-          </p>
         </div>
       </div>
     </div>

@@ -7,23 +7,19 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <DashboardCard
-          title="Total Users"
+          title="Temperature"
           value="1,245"
-          icon="users"
-          trend="+12%"
+          icon="temperature"
         />
         <DashboardCard
-          title="Revenue"
+          title="Humidity"
           value="$34,567"
-          icon="dollar"
-          trend="+8%"
+          icon="humidity"
         />
         <DashboardCard
-          title="Active Projects"
+          title="Barometric Pressure"
           value="28"
-          icon="projects"
-          trend="-3%"
-          trendDirection="down"
+          icon="barometric"
         />
       </div>
 
