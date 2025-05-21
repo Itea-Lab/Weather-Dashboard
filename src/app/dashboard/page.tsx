@@ -1,4 +1,5 @@
 import DashboardCard from "@/components/dashboard/DashboardCard";
+import WindChart from "@/components/dashboard/WindChart";
 
 export default function DashboardPage() {
   return (
@@ -38,7 +39,9 @@ export default function DashboardPage() {
             icon="barometric"
           />
         </div>
-        <div className="row-span-3 col-span-3">This is a graph</div>
+        <div className="row-span-3 col-span-3">
+          <WindChart></WindChart>
+        </div>
       </section>
     </div>
   );
