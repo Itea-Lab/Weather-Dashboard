@@ -30,7 +30,7 @@ export default function DatasetTable() {
     };
 
     fetchDatasets();
-  }, []);
+  }, []); //Fetch one time only
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -143,7 +143,9 @@ export default function DatasetTable() {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{dataset.humidity}</div>
+                  <div className="text-sm text-gray-900">
+                    {dataset.humidity}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
@@ -177,7 +179,10 @@ export default function DatasetTable() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-3">
-                    <button className="text-red-600 hover:text-red-900">
+                    <button
+                      className="text-red-600 hover:text-red-900"
+                      // onClick={() => handleDelete(dataset.id)}
+                    >
                       Delete
                     </button>
                   </div>

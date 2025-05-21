@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { Dataset } from "@/types/dataset";
-import { temperatureData } from "@/types/sensorData";
 
 const sampleDatasets: Dataset[] = [
   {
