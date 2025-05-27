@@ -16,7 +16,7 @@ export default function DatasetTable() {
     const fetchDatasets = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/auth");
+        const response = await fetch("/api/dataset");
         if (!response.ok) {
           throw new Error("Failed to fetch datasets");
         }

@@ -23,7 +23,7 @@ export default function WindChart() {
     const fetchSensorData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/sensorData");
+        const response = await fetch("/api/windData");
         if (!response.ok) {
           throw new Error("Failed to fetch sensor data");
         }
