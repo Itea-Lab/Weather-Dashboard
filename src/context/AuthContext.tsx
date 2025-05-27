@@ -11,14 +11,14 @@ import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
+  username: string;
   email: string;
-  name: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -40,25 +40,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        // Example API call to validate token
-        // const response = await fetch('/api/auth/me', {
-        //   headers: { Authorization: `Bearer ${token}` }
-        // });
-        // if (response.ok) {
-        //   const userData = await response.json();
-        //   setUser(userData);
-        // } else {
-        //   localStorage.removeItem('token');
-        // }
+        const response = await fetch('/api/auth', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        } else {
+          localStorage.removeItem('token');
+          setUser(null);
+        }
 
         // For demo, we'll simulate a logged-in user if token exists
-        setUser({
-          id: "1",
-          email: "user@example.com",
-          name: "Demo User",
-        });
+        // setUser({
+        //   id: "1",
+        //   username: "admin",
+        //   email: "admin@example.com",
+        // });
       } catch (error) {
         console.error("Auth check failed:", error);
+        localStorage.removeItem("auth-token");
       } finally {
         setLoading(false);
       }
@@ -67,17 +68,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     setLoading(true);
     try {
       // In a real app, call your API
-      // const response = await fetch('/api/auth/login', {...});
-      // const data = await response.json();
-      // localStorage.setItem('token', data.token);
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Login failed");
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
 
       // For demo purposes
-      localStorage.setItem("token", "demo-token");
-      setUser({ id: "1", email, name: "Demo User" });
+      // localStorage.setItem("token", "demo-token");
+      // setUser({ id: "1", username, email: "admin@example.com" });
+
       router.push("/dashboard");
     } catch (error) {
       throw error;

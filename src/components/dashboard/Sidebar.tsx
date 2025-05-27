@@ -10,7 +10,11 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
 
   const menuItems = [
-    { name: "Dashboard", path: "/dashboard/overview", icon: <LayoutDashboard /> },
+    {
+      name: "Dashboard",
+      path: "/dashboard/overview",
+      icon: <LayoutDashboard />,
+    },
     { name: "Dataset", path: "/dashboard/dataset", icon: <Database /> },
   ];
 
@@ -49,17 +53,15 @@ export default function Sidebar() {
               </li>
             ))}
           </ul>
-          <ul className="mt-6 space-y-2">
-            <button
-              onClick={logout}
-              className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              <span className="mr-3">
-                <LogOut />
-              </span>
-              Logout
-            </button>
-          </ul>
+          <button
+            onClick={logout}
+            className="mt-6 space-y-2 w-full flex items-center px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <span className="mr-3">
+              <LogOut />
+            </span>
+            Logout
+          </button>
         </nav>
       </div>
     </aside>
