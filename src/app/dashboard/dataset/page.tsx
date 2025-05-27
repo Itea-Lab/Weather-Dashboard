@@ -2,16 +2,16 @@
 import { Metadata } from "next";
 import DatasetTable from "@/components/dashboard/DataTable";
 import DatasetFilters from "@/components/dashboard/DataFilter";
-import {Download} from "lucide-react";
+import { Download } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Datasets | My App",
+  title: "Datasets",
   description: "Browse and manage your datasets",
 };
 
 export default function DatasetsPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h1 className="text-3xl font-bold">Datasets</h1>
         <div className="mt-4 md:mt-0">
@@ -29,7 +29,9 @@ export default function DatasetsPage() {
           <DatasetFilters />
         </div>
 
-        <DatasetTable />
+        <div className="p-6">
+          <DatasetTable />
+        </div>
       </div>
     </div>
   );

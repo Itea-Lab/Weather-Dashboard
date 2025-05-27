@@ -4,6 +4,7 @@ export interface WindData {
   timestamp: string | number;
   avgWindSpeed: number;
   maxWindSpeed: number;
+  windDirection: number;
 }
 
 export interface cardData {

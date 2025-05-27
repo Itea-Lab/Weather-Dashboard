@@ -4,6 +4,8 @@ import {
   Droplets,
   Gauge,
   ChartNoAxesCombined,
+  Wind,
+  Compass,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -33,7 +35,11 @@ export default function DashboardCard({
       case "humidity":
         return <Droplets/>;
       case "barometric":
-        return <Gauge/>;
+        return <Gauge />;
+      case "windSpeed":
+        return <Wind />;
+      case "windDirection":
+        return <Compass />;
       default:
         return <ChartNoAxesCombined/>;
     }
