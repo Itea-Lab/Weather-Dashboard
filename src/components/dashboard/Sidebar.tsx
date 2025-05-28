@@ -11,7 +11,7 @@ export default function Sidebar() {
 
   const menuItems = [
     {
-      name: "Dashboard",
+      name: "Overview",
       path: "/dashboard/overview",
       icon: <LayoutDashboard />,
     },
@@ -32,8 +32,10 @@ export default function Sidebar() {
         <div className="mb-6">
           <div className="px-4 py-3 rounded-lg bg-indigo-900 mb-4">
             <p className="text-sm opacity-75">Logged in as</p>
-            <p className="font-medium">{user?.name}</p>
-            <p className="text-sm text-indigo-300">{user?.email}</p>
+            <p className="font-medium">{user?.name || "Loading..."}</p>
+            <p className="text-sm text-indigo-300">
+              {user?.email || "Loading..."}
+            </p>
           </div>
         </div>
 

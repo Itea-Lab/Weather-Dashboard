@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 interface User {
   id: string;
   username: string;
+  name: string;
   email: string;
 }
 
@@ -44,10 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+          const data = await response.json();
+          setUser(data.user);
         } else {
-          localStorage.removeItem('token');
+          localStorage.removeItem('auth-token');
           setUser(null);
         }
 
@@ -86,14 +87,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('auth-token', data.token);
       setUser(data.user);
 
       // For demo purposes
       // localStorage.setItem("token", "demo-token");
       // setUser({ id: "1", username, email: "admin@example.com" });
 
-      router.push("/dashboard");
+      router.push("/dashboard/overview");
     } catch (error) {
       throw error;
     } finally {
@@ -102,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("auth-token");
     setUser(null);
     router.push("/");
   };

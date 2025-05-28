@@ -50,7 +50,7 @@ export default function LoginForm() {
           htmlFor="username"
           className="block text-sm font-medium text-gray-700"
         >
-          Email address
+          Username
         </label>
         <input
           id="username"

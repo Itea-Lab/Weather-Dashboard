@@ -7,7 +7,8 @@ const users = [
     id: "1",
     username: process.env.ADMIN_USERNAME,
     passwordHash: process.env.ADMIN_PASSWORD_HASH,
-    name: "admin",
+    name: process.env.ADMIN_NAME,
+    email: process.env.ADMIN_EMAIL,
   },
 ];
 
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         username: user.username,
         name: user.name,
+        email: user.email,
       },
       process.env.JWT_SECRET!,
       { expiresIn: process.env.JWT_EXPIRES_IN }
@@ -50,6 +52,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         username: user.username,
         name: user.name,
+        email: user.email,
       },
       token,
     });
@@ -90,6 +93,7 @@ export async function GET(request: NextRequest) {
         id: decoded.userId,
         username: decoded.username,
         name: decoded.name,
+        email: decoded.email,
       },
     });
   } catch (error) {
