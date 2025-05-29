@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAuth = async () => {
       try {
         // In a real app, verify the token with your backend
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("auth-token");
         if (!token) {
           setLoading(false);
           return;
