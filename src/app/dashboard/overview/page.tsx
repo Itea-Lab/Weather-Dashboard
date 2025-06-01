@@ -1,4 +1,4 @@
-import DashboardCard from "@/components/dashboard/DashboardCard";
+import WeatherCard from "@/components/dashboard/WeatherCard";
 import WindChart from "@/components/dashboard/WindChart";
 import RainChart from "@/components/dashboard/RainChart";
 
@@ -13,60 +13,52 @@ export default function OverviewPage() {
         <h1 className="text-3xl font-bold">Overview</h1>
         <section>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <DashboardCard
+            <WeatherCard
               title="Temperature"
-              icon="temperature"
-              apiEndpoint="/api/dataset"
               dataKey="temperature"
               unit="°C"
+              icon="temperature"
             />
-            <DashboardCard
+            <WeatherCard
               title="Humidity"
-              icon="humidity"
-              apiEndpoint="/api/dataset"
               dataKey="humidity"
               unit="%"
+              icon="humidity"
             />
-            <DashboardCard
-              title="Barometric Pressure"
-              icon="barometric"
-              apiEndpoint="/api/dataset"
+            <WeatherCard
+              title="Pressure"
               dataKey="pressure"
               unit=" hPa"
+              icon="barometric"
             />
           </div>
         </section>
         {/* More dashboard content */}
         <section className="my-4">
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left side - Wind cards */}
             <div className="lg:w-1/3 space-y-6">
-              <DashboardCard
-                title="Wind Speed (Avg)"
-                icon="windSpeed"
-                apiEndpoint="/api/windData"
+              <WeatherCard
+                title="Wind Speed"
                 dataKey="avgWindSpeed"
                 unit=" m/s"
-              />
-              <DashboardCard
-                title="Wind Speed (Max)"
                 icon="windSpeed"
-                apiEndpoint="/api/windData"
-                dataKey="maxWindSpeed"
-                unit="m/s"
               />
-              <DashboardCard
+              <WeatherCard
+                title="Wind Speed (Max)"
+                dataKey="maxWindSpeed"
+                unit=" m/s"
+                icon="windSpeed"
+              />
+              <WeatherCard
                 title="Wind Direction"
-                icon="windDirection"
-                apiEndpoint="/api/windData"
                 dataKey="windDirection"
                 unit="°"
+                icon="windDirection"
               />
             </div>
 
-            {/* Right side - Wind chart */}
             <div className="lg:w-2/3">
-              <WindChart />
+              <WindChart></WindChart>
             </div>
           </div>
         </section>

@@ -1,156 +1,119 @@
 "use client";
+
+import { useState } from "react";
+import { useRainData } from "@/lib/api";
 import {
-  Bar,
   BarChart,
-  CartesianGrid,
+  Bar,
   XAxis,
   YAxis,
-  ResponsiveContainer,
+  CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
-import { useEffect, useState } from "react";
-import { RainData } from "@/types/sensorData";
+import { format, parseISO } from "date-fns";
 
 export default function RainChart() {
-  const [sensorData, setSensorData] = useState<RainData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState("-1h");
+  const { rainData, error, isLoading } = useRainData(timeRange);
 
-  useEffect(() => {
-    const fetchSensorData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/rainFallData");
-        if (!response.ok) {
-          throw new Error("Failed to fetch sensor data");
-        }
-        const data: RainData[] = await response.json();
-        // Format timestamp for display
-        const formattedData = data.map((item) => ({
-          ...item,
-          time: new Date(item.timestamp).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          date: new Date(item.timestamp).toLocaleDateString(),
-        }));
-        setSensorData(formattedData);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return format(date, "HH:mm");
+    } catch {
+      return dateString;
+    }
+  };
 
-    fetchSensorData();
+  const handleTimeRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTimeRange(e.target.value);
+  };
 
-    // Polling every 10 seconds for real-time updates
-    const interval = setInterval(fetchSensorData, 10000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="bg-white shadow-md rounded-lg p-6 h-80 flex items-center justify-center">
         <div className="text-gray-500">Loading rainfall data...</div>
       </div>
     );
   }
 
-  // Handle error state
   if (error) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow flex justify-center items-center h-64">
-        <div className="text-red-500 text-center">
-          Error: {error}
-          <button
-            onClick={() => {
-              setLoading(true);
-              setError(null);
-              fetch("/api/rainFallData")
-                .then((response) => response.json())
-                .then((data: RainData[]) => {
-                  const formattedData = data.map((item) => ({
-                    ...item,
-                    time: new Date(item.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }),
-                    date: new Date(item.timestamp).toLocaleDateString(),
-                  }));
-                  setSensorData(formattedData);
-                  setLoading(false);
-                })
-                .catch((err) => {
-                  setError(
-                    err instanceof Error ? err.message : "An error occurred"
-                  );
-                  setLoading(false);
-                });
-            }}
-            className="ml-4 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="bg-white shadow-md rounded-lg p-6 h-80 flex items-center justify-center">
+        <div className="text-red-500">Failed to load rainfall data</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Rainfall Data
-      </h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={sensorData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="time"
-            tickLine={false}
-            tickMargin={10}
-            axisLine={false}
-          />
-          <YAxis
-            label={{
-              value: "Rainfall (mm)",
-              angle: -90,
-              position: "insideLeft",
-            }}
-          />
-          <Tooltip
-            formatter={(value, name) => [
-              `${value} mm`,
-              name === "rainFallbyHour"
-                ? "Hourly Rainfall"
-                : name === "rainFallbyDay"
-                ? "Daily Rainfall"
-                : name,
-            ]}
-            labelFormatter={(label) => `Time: ${label}`}
-          />
-          <Legend />
-          <Bar
-            dataKey="rainFallbyDay"
-            fill="#3b82f6"
-            radius={4}
-            name="Daily Rainfall"
-          />
-          <Bar
-            dataKey="rainFallbyHour"
-            fill="#10b981"
-            radius={4}
-            name="Hourly Rainfall"
-          />
-        </BarChart>
-      </ResponsiveContainer>
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Rainfall Data</h2>
+        <div className="flex items-center space-x-2">
+          <label htmlFor="rainTimeRange" className="text-sm text-gray-500">
+            Time Range:
+          </label>
+          <select
+            id="rainTimeRange"
+            value={timeRange}
+            onChange={handleTimeRangeChange}
+            className="text-sm border rounded px-2 py-1"
+          >
+            <option value="-1h">Last Hour</option>
+            <option value="-6h">Last 6 Hours</option>
+            <option value="-12h">Last 12 Hours</option>
+            <option value="-24h">Last 24 Hours</option>
+          </select>
+        </div>
+      </div>
+
+      {rainData && rainData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={rainData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="timestamp"
+              tickFormatter={formatDate}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis
+              label={{
+                value: "Rainfall (mm)",
+                angle: -90,
+                position: "insideLeft",
+              }}
+              tick={{ fontSize: 12 }}
+            />
+            <Tooltip
+              labelFormatter={(value) => `Time: ${formatDate(value)}`}
+              formatter={(value: number, name: string) => [
+                `${value.toFixed(2)} mm`,
+                name === "rainFallbyHour"
+                  ? "Hourly Rainfall"
+                  : name === "rainFallbyDay"
+                  ? "Daily Rainfall"
+                  : name,
+              ]}
+            />
+            <Legend />
+            <Bar
+              dataKey="rainFallbyHour"
+              name="Hourly Rainfall"
+              fill="#3b82f6"
+            />
+            <Bar dataKey="rainFallbyDay" name="Daily Rainfall" fill="#10b981" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="h-80 flex items-center justify-center">
+          <div className="text-gray-500">No rainfall data available</div>
+        </div>
+      )}
     </div>
   );
 }
