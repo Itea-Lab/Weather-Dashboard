@@ -9,5 +9,5 @@ export interface Dataset {
   windDirection: number;
   rainFallbyDay: number;
   rainFallbyHour: number;
-  status: "active" | "processing" | "error";
+  location: string;
 }

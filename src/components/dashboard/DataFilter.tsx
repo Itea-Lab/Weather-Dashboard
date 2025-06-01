@@ -58,7 +58,6 @@ export default function DatasetFilters() {
           >
             <option value="ascending">Ascending</option>
             <option value="descending">Descending</option>
-            <option value="lastUpdate">Last Updated</option>
           </select>
         </div>
       </div>

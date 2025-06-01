@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { cardData, WindData, RainData } from "@/types/sensorData";
+import { Dataset } from "@/types/dataset";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -40,6 +41,20 @@ export function useRainData(timeRange: string = "-24h") {
 
   return {
     rainData: data,
+    error,
+    isLoading,
+  };
+}
+
+export function useDatasetData() {
+  const { data, error, isLoading } = useSWR<Dataset[]>(
+    `/api/dataset`,
+    fetcher,
+    { refreshInterval: 30000 }
+  );
+
+  return {
+    datasetData: data,
     error,
     isLoading,
   };

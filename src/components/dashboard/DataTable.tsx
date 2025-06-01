@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { Dataset } from "@/types/dataset";
@@ -121,6 +121,12 @@ export default function DatasetTable() {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Location
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Actions
               </th>
             </tr>
@@ -130,10 +136,8 @@ export default function DatasetTable() {
               <tr key={dataset.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {new Date(dataset.timestamp).toLocaleString()}
-                      </div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {new Date(dataset.timestamp).toLocaleString()}
                     </div>
                   </div>
                 </td>
@@ -175,6 +179,11 @@ export default function DatasetTable() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {dataset.rainFallbyDay}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {dataset.location}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -253,8 +262,213 @@ export default function DatasetTable() {
               </button>
 
               {/* Page numbers */}
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (number) => (
+              {(() => {
+                const pageNumbers = [];
+                const maxPagesToShow = 5;
+
+                let startPage: number, endPage: number;
+
+                if (totalPages <= maxPagesToShow) {
+                  startPage = 1;
+                  endPage = totalPages;
+                } else {
+                  // Calculate start and end pages
+                  const middlePoint = Math.floor(maxPagesToShow / 2);
+
+                  if (currentPage <= middlePoint + 1) {
+                    startPage = 1;
+                    endPage = maxPagesToShow - 1;
+                    // Add last page and ellipsis
+                    pageNumbers.push(
+                      ...Array.from({ length: endPage }, (_, i) => i + 1).map(
+                        (number) => (
+                          <button
+                            key={number}
+                            onClick={() => paginate(number)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              currentPage === number
+                                ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                            }`}
+                          >
+                            {number}
+                          </button>
+                        )
+                      )
+                    );
+
+                    // Add ellipsis if needed
+                    if (totalPages > maxPagesToShow) {
+                      pageNumbers.push(
+                        <span
+                          key="ellipsis"
+                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    // Add last page
+                    pageNumbers.push(
+                      <button
+                        key={totalPages}
+                        onClick={() => paginate(totalPages)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === totalPages
+                            ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        {totalPages}
+                      </button>
+                    );
+
+                    return pageNumbers;
+                  } else if (currentPage >= totalPages - middlePoint) {
+                    // Near the end
+                    startPage = totalPages - (maxPagesToShow - 2);
+                    endPage = totalPages;
+
+                    // Add first page
+                    pageNumbers.push(
+                      <button
+                        key={1}
+                        onClick={() => paginate(1)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === 1
+                            ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        1
+                      </button>
+                    );
+
+                    // Add ellipsis if needed
+                    if (startPage > 2) {
+                      pageNumbers.push(
+                        <span
+                          key="ellipsis"
+                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    // Add remaining pages
+                    pageNumbers.push(
+                      ...Array.from(
+                        { length: endPage - startPage + 1 },
+                        (_, i) => i + startPage
+                      ).map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => paginate(number)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === number
+                              ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {number}
+                        </button>
+                      ))
+                    );
+
+                    return pageNumbers;
+                  } else {
+                    // In the middle
+                    startPage =
+                      currentPage - Math.floor((maxPagesToShow - 3) / 2);
+                    endPage = currentPage + Math.ceil((maxPagesToShow - 3) / 2);
+
+                    // Add first page
+                    pageNumbers.push(
+                      <button
+                        key={1}
+                        onClick={() => paginate(1)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === 1
+                            ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        1
+                      </button>
+                    );
+
+                    // Add first ellipsis
+                    if (startPage > 2) {
+                      pageNumbers.push(
+                        <span
+                          key="ellipsis1"
+                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    // Add middle pages
+                    pageNumbers.push(
+                      ...Array.from(
+                        { length: endPage - startPage + 1 },
+                        (_, i) => i + startPage
+                      ).map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => paginate(number)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === number
+                              ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {number}
+                        </button>
+                      ))
+                    );
+
+                    // Add last ellipsis
+                    if (endPage < totalPages - 1) {
+                      pageNumbers.push(
+                        <span
+                          key="ellipsis2"
+                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    // Add last page
+                    if (endPage !== totalPages) {
+                      pageNumbers.push(
+                        <button
+                          key={totalPages}
+                          onClick={() => paginate(totalPages)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === totalPages
+                              ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+                              : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                          }`}
+                        >
+                          {totalPages}
+                        </button>
+                      );
+                    }
+
+                    return pageNumbers;
+                  }
+                }
+
+                // Handle the simple case when total pages <= maxPagesToShow
+                return Array.from(
+                  { length: endPage - startPage + 1 },
+                  (_, i) => i + startPage
+                ).map((number) => (
                   <button
                     key={number}
                     onClick={() => paginate(number)}
@@ -266,8 +480,8 @@ export default function DatasetTable() {
                   >
                     {number}
                   </button>
-                )
-              )}
+                ));
+              })()}
 
               <button
                 onClick={() =>
