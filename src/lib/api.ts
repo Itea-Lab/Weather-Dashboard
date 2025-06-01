@@ -61,9 +61,9 @@ export function useDatasetData(
   if (search) queryString.append("search", search);
   if (range) queryString.append("range", range);
 
-  const url = `/api/dataset?${queryString.toString()}`;
+  const url = `/api/weather/dataset?${queryString.toString()}`;
 
-  const { data, error, isLoading } = useSWR<Dataset[]>(url, fetcher, {
+  const { data, error, isLoading, mutate } = useSWR<Dataset[]>(url, fetcher, {
     refreshInterval: 30000,
   });
 
@@ -71,5 +71,29 @@ export function useDatasetData(
     datasets: data || [],
     error,
     isLoading,
+    mutate,
   };
+}
+
+export async function deleteDatapoint(timestamp: string) {
+  try {
+    const response = await fetch("/api/weather/deleteData", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ timestamp, location }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to delete data");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error deleting datapoint:", error);
+    throw error;
+  }
 }

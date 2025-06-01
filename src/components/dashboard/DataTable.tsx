@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import DatasetFilters from "./DataFilter";
-import { useDatasetData } from "@/lib/api";
+import { useDatasetData, deleteDatapoint } from "@/lib/api";
 
 export default function DatasetTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,13 +11,14 @@ export default function DatasetTable() {
     search: "",
     sortOrder: "desc" as "asc" | "desc",
   });
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const { datasets = [], error, isLoading } = useDatasetData(filters);
+  const { datasets = [], error, isLoading, mutate } = useDatasetData(filters);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [filters]);
-
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -32,6 +33,40 @@ export default function DatasetTable() {
     sortOrder: "asc" | "desc";
   }) => {
     setFilters(newFilters);
+  };
+
+  const handleDelete = async (timestamp: string) => {
+    try {
+      const dataset = datasets.find((d) => d.timestamp === timestamp);
+      if (!dataset) {
+        throw new Error("Dataset not found");
+      }
+
+      // Confirm deletion
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete the record from ${new Date(
+          dataset.timestamp
+        ).toLocaleString()}?`
+      );
+
+      if (!confirmDelete) {
+        return;
+      }
+
+      setIsDeleting(timestamp);
+      setDeleteError(null);
+
+      await deleteDatapoint(dataset.timestamp);
+      await mutate();
+      console.log("Dataset deleted successfully");
+    } catch (error) {
+      console.error("Error deleting dataset:", error);
+      setDeleteError(
+        error instanceof Error ? error.message : "Failed to delete dataset"
+      );
+    } finally {
+      setIsDeleting(null);
+    }
   };
 
   if (isLoading) {
@@ -60,6 +95,18 @@ export default function DatasetTable() {
           onFilterChange={handleFilterChange}
         />
       </div>
+      {/* Show delete error if any */}
+      {deleteError && (
+        <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+          <p>Error: {deleteError}</p>
+          <button
+            onClick={() => setDeleteError(null)}
+            className="text-red-800 underline text-sm mt-1"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -192,9 +239,12 @@ export default function DatasetTable() {
                   <div className="flex space-x-3">
                     <button
                       className="text-red-600 hover:text-red-900"
-                      // onClick={() => handleDelete(dataset.id)}
+                      onClick={() => handleDelete(dataset.timestamp)}
+                      disabled={isDeleting === dataset.timestamp}
                     >
-                      Delete
+                      {isDeleting === dataset.timestamp
+                        ? "Deleting..."
+                        : "Delete"}
                     </button>
                   </div>
                 </td>

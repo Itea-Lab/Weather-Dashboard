@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get("range") || "-24h";
-    const bucket = process.env.INFLUXDB_BUCKET || "weather_data";
+    const bucket = process.env.INFLUXDB_BUCKET;
 
     const query = `
       from(bucket: "${bucket}")
