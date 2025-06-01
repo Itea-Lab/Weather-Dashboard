@@ -1,17 +1,31 @@
-// src/components/datasets/DatasetFilters.tsx
 "use client";
 
 import { useState } from "react";
+interface DatasetFiltersProps {
+  sortOrder: "asc" | "desc";
+  onFilterChange?: (filters: {
+    search: string;
+    sortOrder: "asc" | "desc";
+  }) => void;
+}
 
-export default function DatasetFilters() {
+export default function DatasetFilters({ sortOrder, onFilterChange }: DatasetFiltersProps) {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("date");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality
     console.log("Searching for:", search);
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSortOrder = e.target.value as "asc" | "desc";
+
+    if (onFilterChange) {
+      onFilterChange({
+        search,
+        sortOrder: newSortOrder,
+      });
+    }
   };
 
   return (
@@ -52,12 +66,12 @@ export default function DatasetFilters() {
           </label>
           <select
             id="sortBy"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            value={sortOrder}
+            onChange={handleSortChange}
             className="w-full sm:w-40 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="ascending">Ascending</option>
-            <option value="descending">Descending</option>
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
           </select>
         </div>
       </div>

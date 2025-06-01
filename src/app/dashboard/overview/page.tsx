@@ -3,7 +3,7 @@ import WindChart from "@/components/dashboard/WindChart";
 import RainChart from "@/components/dashboard/RainChart";
 
 export const metadata = {
-  title: "Overview - Dashboard",
+  title: "Overview",
   description: "Weather station overview dashboard",
 };
 

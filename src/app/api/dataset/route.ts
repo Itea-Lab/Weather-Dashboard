@@ -83,6 +83,9 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get("range") || "-30d";
+    const sortOrder =
+      searchParams.get("sortOrder") || searchParams.get("sort") || "desc";
+    const isDescending = sortOrder.toLowerCase() === "desc";
     const bucket = process.env.INFLUXDB_BUCKET;
 
     const query = `
@@ -91,7 +94,7 @@ export async function GET(request: Request) {
         |> filter(fn: (r) => r._measurement == "weather_sensor")
         |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "pressure" or r._field == "avgWindSpeed" or r._field == "maxWindSpeed" or r._field == "windDirection" or r._field == "rainFallbyDay" or r._field == "rainFallbyHour")
         |> pivot(rowKey:["_time", "location"], columnKey: ["_field"], valueColumn: "_value")
-        |> sort(columns: ["_time"], desc: true)
+        |> sort(columns: ["_time"], desc: ${isDescending})
     `;
 
     const result = await executeQuery(query);

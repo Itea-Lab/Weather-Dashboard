@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-// import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm() {
@@ -9,7 +8,6 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  // const router = useRouter();
   const { login } = useAuth();
 
 
@@ -19,17 +17,7 @@ export default function LoginForm() {
     setError("");
 
     try {
-      // In a real app, you would call your authentication API here
-
       await login(username, password);
-      // For demonstration, we'll simulate a successful login
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Store auth token or user info (in a real app)
-      // localStorage.setItem('token', data.token);
-
-      // Redirect to dashboard
-      // router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

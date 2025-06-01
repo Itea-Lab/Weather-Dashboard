@@ -1,10 +1,7 @@
-// src/app/dashboard/datasets/page.tsx
-import { Metadata } from "next";
 import DatasetTable from "@/components/dashboard/DataTable";
-import DatasetFilters from "@/components/dashboard/DataFilter";
 import { Download } from "lucide-react";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Datasets",
   description: "Browse and manage your datasets",
 };
@@ -25,10 +22,6 @@ export default function DatasetsPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <DatasetFilters />
-        </div>
-
         <div className="p-6">
           <DatasetTable />
         </div>

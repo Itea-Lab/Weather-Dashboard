@@ -46,15 +46,29 @@ export function useRainData(timeRange: string = "-24h") {
   };
 }
 
-export function useDatasetData() {
-  const { data, error, isLoading } = useSWR<Dataset[]>(
-    `/api/dataset`,
-    fetcher,
-    { refreshInterval: 30000 }
-  );
+export function useDatasetData(
+  filters: {
+    search?: string;
+    sortOrder?: "asc" | "desc";
+    range?: string;
+  } = {}
+) {
+  const { search = "", sortOrder = "desc", range = "-30d" } = filters;
+
+  // Build URL with query params
+  const queryString = new URLSearchParams();
+  if (sortOrder) queryString.append("sortOrder", sortOrder);
+  if (search) queryString.append("search", search);
+  if (range) queryString.append("range", range);
+
+  const url = `/api/dataset?${queryString.toString()}`;
+
+  const { data, error, isLoading } = useSWR<Dataset[]>(url, fetcher, {
+    refreshInterval: 30000,
+  });
 
   return {
-    datasetData: data,
+    datasets: data || [],
     error,
     isLoading,
   };

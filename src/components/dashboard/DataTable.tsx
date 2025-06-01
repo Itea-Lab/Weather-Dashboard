@@ -1,36 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Dataset } from "@/types/dataset";
+import { useState, useEffect } from "react"; 
+import DatasetFilters from "./DataFilter";
+import { useDatasetData } from "@/lib/api";
 
 export default function DatasetTable() {
-  // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
-  // State for data fetching
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState({
+    search: "",
+    sortOrder: "desc" as "asc" | "desc",
+  });
+
+  const { datasets = [], error, isLoading } = useDatasetData(filters);
 
   useEffect(() => {
-    const fetchDatasets = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/dataset");
-        if (!response.ok) {
-          throw new Error("Failed to fetch datasets");
-        }
-        const data: Dataset[] = await response.json();
-        setDatasets(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+    setCurrentPage(1);
+  }, [filters]);
 
-    fetchDatasets();
-  }, []); //Fetch one time only
 
   // Calculate pagination values
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -40,7 +27,14 @@ export default function DatasetTable() {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  if (loading) {
+  const handleFilterChange = (newFilters: {
+    search: string;
+    sortOrder: "asc" | "desc";
+  }) => {
+    setFilters(newFilters);
+  };
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-gray-500">Loading datasets...</div>
@@ -51,13 +45,21 @@ export default function DatasetTable() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-red-500">Error: {error}</div>
+        <div className="text-red-500">
+          Error: {error.message || "Failed to load data"}
+        </div>
       </div>
     );
   }
 
   return (
     <div>
+      <div className="mb-6">
+        <DatasetFilters
+          sortOrder={filters.sortOrder}
+          onFilterChange={handleFilterChange}
+        />
+      </div>
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
