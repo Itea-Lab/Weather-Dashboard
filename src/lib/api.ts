@@ -4,7 +4,15 @@ import { Dataset } from "@/types/dataset";
 
 const fetcher = async (url: string) => {
   try {
-    const res = await fetch(url);
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
+
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(url, { headers });
 
     // Handle HTTP errors
     if (!res.ok) {
@@ -13,6 +21,10 @@ const fetcher = async (url: string) => {
         errorData = await res.json();
       } catch (e) {
         errorData = { error: res.statusText || "Unknown error" };
+      }
+
+      if (res.status === 401) {
+        console.log("Authentication required, redirecting to login");
       }
 
       const error = new Error(
@@ -142,12 +154,15 @@ export function useDatasetData(
 
 export async function deleteDatapoint(timestamp: string) {
   try {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
     const response = await fetch("/api/weather/deleteData", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
       },
-      body: JSON.stringify({ timestamp, location }),
+      body: JSON.stringify({ timestamp }),
     });
 
     if (!response.ok) {
