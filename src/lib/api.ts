@@ -2,7 +2,47 @@ import useSWR from "swr";
 import { cardData, WindData, RainData } from "@/types/sensorData";
 import { Dataset } from "@/types/dataset";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  try {
+    const res = await fetch(url);
+
+    // Handle HTTP errors
+    if (!res.ok) {
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch (e) {
+        errorData = { error: res.statusText || "Unknown error" };
+      }
+
+      const error = new Error(
+        errorData.message || errorData.error || "API request failed"
+      );
+      (error as any).status = res.status;
+      (error as any).info = errorData;
+      throw error;
+    }
+
+    // Parse the JSON response
+    const data = await res.json();
+
+    // Validate that data is in the expected format when needed
+    if (url.includes("/api/weather/dataset") && !Array.isArray(data)) {
+      throw new Error("Invalid data format: Expected an array for dataset");
+    }
+
+    return data;
+  } catch (error) {
+    // Handle network errors
+    if (error instanceof Error && error.message.includes("Failed to fetch")) {
+      const networkError = new Error("Cannot connect to server");
+      (networkError as any).isNetworkError = true;
+      throw networkError;
+    }
+
+    throw error;
+  }
+};
 
 export function useLatestWeatherData() {
   const { data, error, isLoading } = useSWR<cardData>(
@@ -13,7 +53,11 @@ export function useLatestWeatherData() {
 
   return {
     data,
-    error,
+    error: error
+      ? error instanceof Error
+        ? error
+        : new Error(String(error))
+      : null,
     isLoading,
   };
 }
@@ -27,7 +71,11 @@ export function useWindData(timeRange: string = "-24h") {
 
   return {
     windData: data,
-    error,
+    error: error
+      ? error instanceof Error
+        ? error
+        : new Error(String(error))
+      : null,
     isLoading,
   };
 }
@@ -41,7 +89,11 @@ export function useRainData(timeRange: string = "-24h") {
 
   return {
     rainData: data,
-    error,
+    error: error
+      ? error instanceof Error
+        ? error
+        : new Error(String(error))
+      : null,
     isLoading,
   };
 }
@@ -65,10 +117,23 @@ export function useDatasetData(
 
   const { data, error, isLoading, mutate } = useSWR<Dataset[]>(url, fetcher, {
     refreshInterval: 30000,
+    fallbackData: [],
+    onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+      // Don't retry on 404s or bad data format errors
+      if (
+        error.status === 404 ||
+        error.message.includes("Invalid data format") ||
+        retryCount >= 3
+      )
+        return;
+
+      // Retry after 5 seconds
+      setTimeout(() => revalidate({ retryCount }), 5000);
+    },
   });
 
   return {
-    datasets: data || [],
+    datasets: Array.isArray(data) ? data : [],
     error,
     isLoading,
     mutate,

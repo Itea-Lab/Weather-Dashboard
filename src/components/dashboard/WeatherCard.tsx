@@ -51,7 +51,11 @@ export default function WeatherCard({
           <div className="h-8 bg-gray-200 rounded w-16"></div>
         </div>
       );
-    if (error) return <span className="ml-2 text-xs text-red-400">({error})</span>;
+    if (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : String(error);
+      return <span className="ml-2 text-xs text-red-400">({errorMsg})</span>;
+    }
     if (!data) return "N/A";
 
     const value = data[dataKey];
@@ -70,6 +74,20 @@ export default function WeatherCard({
     }
   };
 
+  const getErrorMessage = () => {
+    if (!error) return null;
+
+    // Safely extract error message
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+        ? error
+        : "Unknown error";
+
+    return <p className="text-xs text-red-500">{message}</p>;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-start">
@@ -78,10 +96,13 @@ export default function WeatherCard({
           <p className="text-sm text-gray-500">
             Last update: {getUpdateTime()}
           </p>
+          {error && getErrorMessage()}
         </div>
         <div className="text-2xl">{getIcon()}</div>
       </div>
-      <div className="mt-2 text-3xl font-semibold text-gray-900">{getValue()}</div>
+      <div className="mt-2 text-3xl font-semibold text-gray-900">
+        {getValue()}
+      </div>
     </div>
   );
 }

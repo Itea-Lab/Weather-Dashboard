@@ -78,10 +78,93 @@ export default function DatasetTable() {
   }
 
   if (error) {
+    let errorTitle = "Error Loading Data";
+    let errorMessage = "An unexpected error occurred while loading datasets.";
+    let errorAction = "Please try again later.";
+
+    // Check error type
+    if (error instanceof Error) {
+      if ((error as any).isNetworkError) {
+        errorTitle = "Connection Error";
+        errorMessage = "Cannot connect to the server.";
+        errorAction = "Please check your network connection and try again.";
+      } else if ((error as any).status === 500) {
+        errorTitle = "Database Connection Error";
+        errorMessage = "Cannot connect to the database.";
+        errorAction =
+          "Please ensure the database is running and properly configured.";
+      } else if (error.message.includes("Invalid data format")) {
+        errorTitle = "Data Format Error";
+        errorMessage = "The data received was not in the expected format.";
+        errorAction = "Please contact support if this issue persists.";
+      } else {
+
+        errorMessage = error.message || errorMessage;
+      }
+    }
+
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-red-500">
-          Error: {error.message || "Failed to load data"}
+      <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow">
+        <div className="text-center px-6 max-w-md">
+          <svg
+            className="mx-auto h-12 w-12 text-red-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">
+            {errorTitle}
+          </h3>
+          <p className="mt-1 text-gray-500">{errorMessage}</p>
+          <p className="mt-1 text-sm text-gray-500">{errorAction}</p>
+          <div className="mt-6">
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (datasets.length === 0 && !isLoading && !error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow">
+        <div className="text-center px-6 max-w-md">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
+          </svg>
+          <h3 className="mt-2 text-lg font-medium text-gray-900">
+            No Data Available
+          </h3>
+          <p className="mt-1 text-gray-500">
+            There are no weather datasets available for the specified filters.
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Try adjusting your filters or check back later.
+          </p>
         </div>
       </div>
     );
