@@ -14,7 +14,6 @@ const mockData: cardData = {
 
 export async function GET() {
   try {
-    // In a real app, you might fetch from a database or external API here
     // For now, return the sample data
     return NextResponse.json(mockData, { status: 200 });
   } catch (error) {

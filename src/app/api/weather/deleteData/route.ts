@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  console.log("----- DELETE DATA REQUEST -----");
+  console.log("Headers:", Object.fromEntries(request.headers.entries()));
+  console.log("Cookies:", request.headers.get("cookie"));
+  console.log("----------------------------");
+  
   return withAuth(request, async (req: Request, { user }: { user: any }) => {
+    console.log("Auth succeeded, user:", user);
     try {
       const { timestamp } = await request.json();
 

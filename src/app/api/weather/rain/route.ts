@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { executeQuery } from "@/lib/influxdb";
-import { withAuth } from "@/lib/auth";
 
 export async function GET(request: Request) {
-  return withAuth(request, async (req: Request) => {
-    try {
-      const { searchParams } = new URL(request.url);
-      const timeRange = searchParams.get("range") || "-24h";
-      const bucket = process.env.INFLUXDB_BUCKET;
+  try {
+    const { searchParams } = new URL(request.url);
+    const timeRange = searchParams.get("range") || "-24h";
+    const bucket = process.env.INFLUXDB_BUCKET;
 
-      const query = `
+    const query = `
       from(bucket: "${bucket}")
         |> range(start: ${timeRange})
         |> filter(fn: (r) => r._measurement == "weather_sensor")
@@ -18,23 +16,22 @@ export async function GET(request: Request) {
         |> sort(columns: ["_time"])
     `;
 
-      const result = await executeQuery(query);
+    const result = await executeQuery(query);
 
-      // Format the response to match RainData interface
-      const data = result.map((row: any, index: number) => ({
-        id: index + 1,
-        timestamp: row._time,
-        rainFallbyDay: row.rainFallbyDay || 0,
-        rainFallbyHour: row.rainFallbyHour || 0,
-      }));
+    // Format the response to match RainData interface
+    const data = result.map((row: any, index: number) => ({
+      id: index + 1,
+      timestamp: row._time,
+      rainFallbyDay: row.rainFallbyDay || 0,
+      rainFallbyHour: row.rainFallbyHour || 0,
+    }));
 
-      return NextResponse.json(data);
-    } catch (error) {
-      console.error("Error fetching rain data:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch rain data" },
-        { status: 500 }
-      );
-    }
-  });
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error fetching rain data:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch rain data" },
+      { status: 500 }
+    );
+  }
 }

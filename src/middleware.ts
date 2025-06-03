@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  const protectedPaths = ["/api/mockData/", "/api/weather/"];
+  // console.log("Middleware triggered for path:", path);
   // Skip middleware for non-API routes or the auth API itself
   if (!path.startsWith("/api/") || path.startsWith("/api/auth")) {
     return NextResponse.next();
@@ -14,8 +16,8 @@ export function middleware(request: NextRequest) {
   const isDirectAccess = !referer.includes(request.nextUrl.origin);
 
   // check if this is direct access
-  if (isDirectAccess && path.startsWith("/api/weather/")) {
-    console.log("Blocking direct API access");
+  if (isDirectAccess && protectedPaths.some((p) => path.startsWith(p))) {
+    // console.log("Blocking direct API access");
     return NextResponse.json(
       { error: "Direct API access not allowed" },
       { status: 403 }
@@ -26,7 +28,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/api/:path*",
-  ],
+  matcher: ["/api/:path*"],
 };

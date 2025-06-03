@@ -79,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -88,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
       localStorage.setItem('auth-token', data.token);
+      localStorage.setItem('csrf-token', data.csrfToken);
       setUser(data.user);
 
       // For demo purposes
@@ -102,8 +104,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem("auth-token");
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Error during logout:", e);
+    }
     setUser(null);
     router.push("/");
   };

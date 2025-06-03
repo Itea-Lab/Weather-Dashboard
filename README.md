@@ -53,6 +53,10 @@ src/                        # Source code for the application
 │   ├───|── ui/             # UI components (Shadcn)
 │   ├── context/            # Context providers for state management
 │   ├── lib/                # Utility functions and libraries
+│   ├───|── auth.ts         # Authentication utilities
+│   ├───|── api.ts          # API utilities
+│   ├───|── influxdb.ts     # InfluxDB utilities
+│   ├───|── utils.ts        # General utility functions
 │   ├── types/              # TypeScript type definitions
 │   ├── dashboard/          # Dashboard main page
 │   ├───|───|── page.tsx
@@ -60,6 +64,7 @@ src/                        # Source code for the application
 │   ├───|── subpage/        # Subpage of the dashboard
 │   ├───|───|── page.tsx
 │   ├── globals.css         # Global CSS styles
+├── middleware.ts           # Middleware for handling requests
 ├── public/                 # Static assets (images, fonts, etc.)
 ├── .env.local              # Environment variables for local development
 ├── .env.production         # Environment variables for production

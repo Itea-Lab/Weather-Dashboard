@@ -1,7 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { SignOptions } from "jsonwebtoken";
+import crypto from "crypto";
 
+// simulate a user database
 const users = [
   {
     id: "1",
@@ -34,7 +37,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate CSRF token
+    const csrfToken = crypto.randomUUID();
+
+    // Create hash of the CSRF token
+    const csrfHash = crypto
+      .createHash("sha256")
+      .update(csrfToken)
+      .digest("hex");
+
     // Generate JWT
+    const signOptions: SignOptions = {
+      expiresIn: "1d",
+    };
+
     const token = jwt.sign(
       {
         userId: user.id,
@@ -43,7 +59,7 @@ export async function POST(request: NextRequest) {
         email: user.email,
       },
       process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      signOptions
     );
 
     // Create response with user data
@@ -55,19 +71,28 @@ export async function POST(request: NextRequest) {
         email: user.email,
       },
       token,
+      csrfToken,
     });
 
     // Set HTTP-only cookie for additional security
     response.cookies.set("auth-token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
+      path: "/",
       maxAge: 24 * 60 * 60, // 1 days
+    });
+    response.cookies.set("csrf-token", csrfHash, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60, // 1 day
     });
 
     return response;
   } catch (error) {
-    console.error("Auth error:", error);
+    // console.error("Auth error:", error);
     return NextResponse.json(
       { error: "Authentication failed" },
       { status: 500 }

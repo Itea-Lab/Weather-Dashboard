@@ -4,15 +4,32 @@ import { Dataset } from "@/types/dataset";
 
 const fetcher = async (url: string) => {
   try {
+    // Get tokens from localStorage
     const token =
       typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
+    const csrfToken =
+      typeof window !== "undefined" ? localStorage.getItem("csrf-token") : null;
 
-    const headers: HeadersInit = {};
+    // Prepare headers
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    // Include CSRF token if available
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
+    // Include Auth token if available (as backup)
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(url, { headers });
+    // Make the request (with credentials to include cookies)
+    const res = await fetch(url, {
+      headers,
+      credentials: "include", // Important: Send cookies with request
+    });
 
     // Handle HTTP errors
     if (!res.ok) {
@@ -23,9 +40,9 @@ const fetcher = async (url: string) => {
         errorData = { error: res.statusText || "Unknown error" };
       }
 
-      if (res.status === 401) {
-        console.log("Authentication required, redirecting to login");
-      }
+      // if (res.status === 401) {
+      //   console.log("Authentication required, redirecting to login");
+      // }
 
       const error = new Error(
         errorData.message || errorData.error || "API request failed"
@@ -154,15 +171,21 @@ export function useDatasetData(
 
 export async function deleteDatapoint(timestamp: string) {
   try {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("auth-token") : null;
+    const token = localStorage.getItem("auth-token");
+    const csrfToken = localStorage.getItem("csrf-token");
+    if (!token || !csrfToken) {
+      throw new Error("Authentication required");
+    }
+
     const response = await fetch("/api/weather/deleteData", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: `Bearer ${token}`,
+        "X-CSRF-Token": csrfToken, // Add the CSRF token
       },
       body: JSON.stringify({ timestamp }),
+      credentials: "include", // Include cookies
     });
 
     if (!response.ok) {
