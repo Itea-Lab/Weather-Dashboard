@@ -22,7 +22,7 @@ export function ChartContainer({
 
 export function ChartTooltip({
   content,
-  ...props
+  ...props 
 }: TooltipProps<number, string> & {
   content: ReactNode;
 }) {

@@ -1,6 +1,6 @@
 export interface Dataset {
   id: string;
-  timestamp: string;
+  _time: any; 
   temperature: number;
   humidity: number;
   pressure: number;

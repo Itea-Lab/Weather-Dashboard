@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { SignOptions } from "jsonwebtoken";
 import crypto from "crypto";
+import { DecodedToken } from "@/types/token";
 
 // simulate a user database
 const users = [
@@ -12,7 +13,7 @@ const users = [
     passwordHash: process.env.ADMIN_PASSWORD_HASH,
     name: process.env.ADMIN_NAME,
     email: process.env.ADMIN_EMAIL,
-    role: process.env.ADMIN_ROLE,
+    roles: process.env.ADMIN_ROLE,
   },
   {
     id: "2",
@@ -20,7 +21,7 @@ const users = [
     passwordHash: process.env.TEST_PASSWORD_HASH,
     name: process.env.TEST_NAME,
     email: process.env.TEST_EMAIL,
-    role: process.env.TEST_ROLE,
+    roles: process.env.TEST_ROLE,
   }
 ];
 
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         name: user.name,
         email: user.email,
-        roles: user.role,
+        roles: user.roles,
       },
       process.env.JWT_SECRET!,
       signOptions
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         name: user.name,
         email: user.email,
+        roles: user.roles,
       },
       token,
       csrfToken,
@@ -101,7 +103,7 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (_error) {
     // console.error("Auth error:", error);
     return NextResponse.json(
       { error: "Authentication failed" },
@@ -121,7 +123,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No token provided" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
 
     return NextResponse.json({
       user: {
@@ -129,9 +131,10 @@ export async function GET(request: NextRequest) {
         username: decoded.username,
         name: decoded.name,
         email: decoded.email,
+        roles: decoded.roles,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 }

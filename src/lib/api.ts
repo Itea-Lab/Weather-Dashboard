@@ -36,7 +36,7 @@ const fetcher = async (url: string) => {
       let errorData;
       try {
         errorData = await res.json();
-      } catch (e) {
+      } catch (_error) {
         errorData = { error: res.statusText || "Unknown error" };
       }
 
@@ -169,13 +169,18 @@ export function useDatasetData(
   };
 }
 
-export async function deleteDatapoint(timestamp: string) {
+export async function deleteDatapoint(timestamp: any) {
   try {
     const token = localStorage.getItem("auth-token");
     const csrfToken = localStorage.getItem("csrf-token");
     if (!token || !csrfToken) {
       throw new Error("Authentication required");
     }
+
+    const formattedTimestamp =
+      timestamp instanceof Date ? timestamp.toISOString() : timestamp;
+
+    // console.log("Deleting datapoint with timestamp:", formattedTimestamp);
 
     const response = await fetch("/api/weather/deleteData", {
       method: "POST",
@@ -184,7 +189,7 @@ export async function deleteDatapoint(timestamp: string) {
         Authorization: `Bearer ${token}`,
         "X-CSRF-Token": csrfToken, // Add the CSRF token
       },
-      body: JSON.stringify({ timestamp }),
+      body: JSON.stringify({ timestamp: formattedTimestamp }),
       credentials: "include", // Include cookies
     });
 

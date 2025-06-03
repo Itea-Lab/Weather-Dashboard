@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       const startTime = new Date(recordTime.getTime() - 1000);
       const stopTime = new Date(recordTime.getTime() + 1000);
 
-      let predicate = `_measurement="weather_sensor"`;
+      const predicate = `_measurement="weather_sensor"`;
 
       const queryParams = new URLSearchParams({
         org: org || "",

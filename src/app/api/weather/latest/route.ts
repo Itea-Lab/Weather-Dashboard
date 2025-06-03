@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { executeQuery } from "@/lib/influxdb";
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     const bucket = process.env.INFLUXDB_BUCKET || "weather_data";
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { executeQuery } from "@/lib/influxdb";
-import { withAuth } from "@/lib/auth";
+import { Dataset } from "@/types/dataset";
 
 // const sampleDatasets: Dataset[] = [
 //   {
@@ -101,14 +101,13 @@ export async function GET(request: Request) {
     const result = await executeQuery(query);
 
     // Format the response to match Dataset interface
-    const data = result.map((row: any, index: number) => {
+    const data = (result as Dataset[]).map((row, index: number) => {
       // Format data
       const round = (value: number) =>
         Number(parseFloat(String(value || 0)).toFixed(1));
-
       return {
         id: index + 1,
-        timestamp: row._time,
+        _time: row._time,
         location: row.location || "unknown",
         temperature: round(row.temperature),
         humidity: round(row.humidity),

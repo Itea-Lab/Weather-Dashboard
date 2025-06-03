@@ -6,7 +6,7 @@ import { useDatasetData, deleteDatapoint } from "@/lib/api";
 
 export default function DatasetTable() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(7);
+  const itemsPerPage = 7;
   const [filters, setFilters] = useState({
     search: "",
     sortOrder: "desc" as "asc" | "desc",
@@ -35,19 +35,27 @@ export default function DatasetTable() {
     setFilters(newFilters);
   };
 
-  const handleDelete = async (timestamp: string) => {
+  const handleDelete = async (timestamp: any) => {
     try {
-      const dataset = datasets.find((d) => d.timestamp === timestamp);
+      const dataset = datasets.find((d) => d._time === timestamp);
       if (!dataset) {
         throw new Error("Dataset not found");
       }
-
+      
       // Confirm deletion
       const confirmDelete = window.confirm(
         `Are you sure you want to delete the record from ${new Date(
-          dataset.timestamp
+          dataset._time
         ).toLocaleString()}?`
       );
+
+      if (!dataset || !dataset._time) {
+        console.error(
+          "Invalid dataset or missing timestamp property:",
+          dataset
+        );
+        throw new Error("Dataset not found or has no timestamp");
+      }
 
       if (!confirmDelete) {
         return;
@@ -56,7 +64,7 @@ export default function DatasetTable() {
       setIsDeleting(timestamp);
       setDeleteError(null);
 
-      await deleteDatapoint(dataset.timestamp);
+      await deleteDatapoint(dataset._time);
       await mutate();
       console.log("Dataset deleted successfully");
     } catch (error) {
@@ -269,7 +277,7 @@ export default function DatasetTable() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="text-sm font-medium text-gray-900">
-                      {new Date(dataset.timestamp).toLocaleString()}
+                      {new Date(dataset._time).toLocaleString()}
                     </div>
                   </div>
                 </td>
@@ -322,10 +330,10 @@ export default function DatasetTable() {
                   <div className="flex space-x-3">
                     <button
                       className="text-red-600 hover:text-red-900"
-                      onClick={() => handleDelete(dataset.timestamp)}
-                      disabled={isDeleting === dataset.timestamp}
+                      onClick={() => handleDelete(dataset._time)}
+                      disabled={isDeleting === dataset._time}
                     >
-                      {isDeleting === dataset.timestamp
+                      {isDeleting === dataset._time
                         ? "Deleting..."
                         : "Delete"}
                     </button>

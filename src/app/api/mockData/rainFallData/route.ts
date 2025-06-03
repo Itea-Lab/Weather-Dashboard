@@ -40,7 +40,7 @@ export async function GET() {
     // In a real app, you might fetch from a database or external API here
     // For now, return the sample data
     return NextResponse.json(rainFallData, { status: 200 });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Failed to fetch data" },
       { status: 500 }

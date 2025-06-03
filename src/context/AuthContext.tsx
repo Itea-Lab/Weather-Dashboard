@@ -8,14 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  username: string;
-  name: string;
-  email: string;
-  roles: string[];
-}
+import { User } from "@/types/user";
 
 interface AuthContextType {
   user: User | null;

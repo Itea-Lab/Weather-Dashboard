@@ -30,7 +30,7 @@ export async function withAuth(req: Request, handler: Function) {
       try {
         const cookieStore = await cookies();
         token = cookieStore.get("auth-token")?.value;
-      } catch (e) {
+      } catch (_error) {
         // Ignore cookie errors
       }
     }

@@ -16,7 +16,7 @@ export async function GET() {
   try {
     // For now, return the sample data
     return NextResponse.json(mockData, { status: 200 });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Failed to fetch data" },
       { status: 500 }
