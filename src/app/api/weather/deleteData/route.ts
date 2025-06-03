@@ -6,9 +6,18 @@ export async function POST(request: Request) {
   console.log("Headers:", Object.fromEntries(request.headers.entries()));
   console.log("Cookies:", request.headers.get("cookie"));
   console.log("----------------------------");
-  
+
   return withAuth(request, async (req: Request, { user }: { user: any }) => {
-    console.log("Auth succeeded, user:", user);
+    const hasPermission =
+      user.roles &&
+      (user.roles.includes(process.env.ADMIN_ROLE));
+
+    if (!hasPermission) {
+      return NextResponse.json(
+        { error: "You don't have permission to delete data" },
+        { status: 403 }
+      );
+    }
     try {
       const { timestamp } = await request.json();
 

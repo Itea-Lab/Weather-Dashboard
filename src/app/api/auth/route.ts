@@ -12,7 +12,16 @@ const users = [
     passwordHash: process.env.ADMIN_PASSWORD_HASH,
     name: process.env.ADMIN_NAME,
     email: process.env.ADMIN_EMAIL,
+    role: process.env.ADMIN_ROLE,
   },
+  {
+    id: "2",
+    username: process.env.TEST_USERNAME,
+    passwordHash: process.env.TEST_PASSWORD_HASH,
+    name: process.env.TEST_NAME,
+    email: process.env.TEST_EMAIL,
+    role: process.env.TEST_ROLE,
+  }
 ];
 
 export async function POST(request: NextRequest) {
@@ -57,6 +66,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         name: user.name,
         email: user.email,
+        roles: user.role,
       },
       process.env.JWT_SECRET!,
       signOptions

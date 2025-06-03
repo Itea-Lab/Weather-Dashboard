@@ -14,6 +14,7 @@ interface User {
   username: string;
   name: string;
   email: string;
+  roles: string[];
 }
 
 interface AuthContextType {
@@ -34,7 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check if user is logged in on initial load
     const checkAuth = async () => {
       try {
-        // In a real app, verify the token with your backend
         const token = localStorage.getItem("auth-token");
         if (!token) {
           setLoading(false);
@@ -52,12 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
         }
 
-        // For demo, we'll simulate a logged-in user if token exists
-        // setUser({
-        //   id: "1",
-        //   username: "admin",
-        //   email: "admin@example.com",
-        // });
       } catch (error) {
         console.error("Auth check failed:", error);
         localStorage.removeItem("auth-token");
@@ -92,10 +86,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('csrf-token', data.csrfToken);
       setUser(data.user);
 
-      // For demo purposes
-      // localStorage.setItem("token", "demo-token");
-      // setUser({ id: "1", username, email: "admin@example.com" });
-
       router.push("/dashboard/overview");
     } catch (error) {
       throw error;
@@ -106,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     localStorage.removeItem("auth-token");
+    localStorage.removeItem("csrf-token");
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch (e) {
