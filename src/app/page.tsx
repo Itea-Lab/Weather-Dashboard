@@ -6,7 +6,7 @@ export default function Home() {
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-bold">ITea Edge Hub</h1>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+          <p className="mt-2 text-gray-600">I AM TEA</p>
         </div>
         <LoginForm />
       </div>
