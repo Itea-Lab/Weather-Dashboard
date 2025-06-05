@@ -39,13 +39,11 @@ const fetcher = async (url: string) => {
       } catch (_error) {
         errorData = { error: res.statusText || "Unknown error" };
       }
-
       // if (res.status === 401) {
       //   console.log("Authentication required, redirecting to login");
       // }
-
       const error = new Error(
-        errorData.message || errorData.error || "API request failed"
+        errorData.error || "API request failed"
       );
       (error as any).status = res.status;
       (error as any).info = errorData;
@@ -53,14 +51,7 @@ const fetcher = async (url: string) => {
     }
 
     // Parse the JSON response
-    const data = await res.json();
-
-    // Validate that data is in the expected format when needed
-    if (url.includes("/api/weather/dataset") && !Array.isArray(data)) {
-      throw new Error("Invalid data format: Expected an array for dataset");
-    }
-
-    return data;
+    return await res.json();;
   } catch (error) {
     // Handle network errors
     if (error instanceof Error && error.message.includes("Failed to fetch")) {

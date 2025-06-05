@@ -12,12 +12,12 @@ export default function DatasetsPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h1 className="text-3xl font-bold">Datasets</h1>
         <div className="mt-4 md:mt-0">
-          <button className="flex items-center  px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+          {/* <button className="flex items-center  px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
             Export{" "}
             <span className="ml-2">
               <Download />
             </span>
-          </button>
+          </button> */}
         </div>
       </div>
 

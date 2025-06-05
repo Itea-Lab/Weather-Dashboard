@@ -46,7 +46,7 @@ export default function LoginForm() {
           required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-[#a8cd89]"
         />
       </div>
 
@@ -63,11 +63,11 @@ export default function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-[#a8cd89]"
         />
       </div>
 
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="flex items-center">
           <input
             id="remember-me"
@@ -88,15 +88,15 @@ export default function LoginForm() {
         >
           Forgot your password?
         </a>
-      </div>
+      </div> */}
 
-      <div>
+      <div className="">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-md text-white bg-[#A8CD89] hover:bg-[#A8CD89] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a8cd89] disabled:opacity-50 font-bold"
         >
-          {isLoading ? "Signing in..." : "Sign in"}
+          {isLoading ? "Signing in..." : "IAM TEA"}
         </button>
       </div>
     </form>

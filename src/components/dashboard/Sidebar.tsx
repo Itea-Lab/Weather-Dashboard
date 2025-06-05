@@ -23,17 +23,17 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="bg-indigo-800 text-white w-50 min-h-screen flex flex-col">
-      <div className="p-4 flex flex-col h-full fixed">
+    <aside className="bg-[#4D5E3F] text-white w-50 min-h-screen flex flex-col py-6">
+      <div className="p-3 flex flex-col h-full fixed">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-center">ITea EdgeHub</h2>
         </div>
 
         <div className="mb-6">
-          <div className="px-4 py-3 rounded-lg bg-indigo-900 mb-4">
+          <div className="px-4 py-3 rounded-lg bg-[#688055] mb-4">
             <p className="text-sm opacity-75">Logged in as</p>
             <p className="font-medium">{user?.name || "Loading..."}</p>
-            <p className="text-sm text-indigo-300">
+            <p className="text-sm text-[#A8CD89]">
               {user?.email || "Loading..."}
             </p>
           </div>
@@ -45,8 +45,8 @@ export default function Sidebar() {
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors ${
-                    isActivePath(item.path) ? "bg-indigo-900" : ""
+                  className={`flex items-center px-4 py-3 rounded-lg hover:bg-[#84A26C] transition-colors ${
+                    isActivePath(item.path) ? "bg-[#688055]" : ""
                   }`}
                 >
                   <span className="mr-3">{item.icon}</span>
@@ -57,7 +57,7 @@ export default function Sidebar() {
           </ul>
           <button
             onClick={logout}
-            className="mt-6 space-y-2 w-full flex items-center px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+            className="mt-6 space-y-2 w-full flex items-center px-4 py-3 rounded-lg hover:bg-[#84A26C] transition-colors"
           >
             <span className="mr-3">
               <LogOut />
