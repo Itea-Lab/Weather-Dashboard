@@ -78,7 +78,7 @@ generateHash();
 ```
 Then run the script:
 ```bash
-pnpm node gen_hash.ts
+ts-node gen_hash.ts
 ```
 
 ## Folder structure
