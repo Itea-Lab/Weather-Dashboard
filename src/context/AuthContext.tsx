@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('csrf-token', data.csrfToken);
       setUser(data.user);
 
-      router.push("/dashboard/overview");
+      router.push("/platform");
     } catch (error) {
       throw error;
     } finally {

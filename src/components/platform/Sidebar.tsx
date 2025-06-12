@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { LayoutDashboard, Database, LogOut } from "lucide-react";
+import {
+  House,
+  LayoutDashboard,
+  Cpu,
+  Database,
+  MessageSquareDot,
+  LogOut,
+} from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -11,11 +18,22 @@ export default function Sidebar() {
 
   const menuItems = [
     {
-      name: "Overview",
-      path: "/dashboard/overview",
+      name: "Home",
+      path: "/platform",
+      icon: <House />,
+    },
+    {
+      name: "Notification",
+      path: "/platform/notification",
+      icon: <MessageSquareDot />,
+    },
+    { name: "Devices", path: "/platform/devices", icon: <Cpu /> },
+    {
+      name: "Dashboard",
+      path: "/platform/overview",
       icon: <LayoutDashboard />,
     },
-    { name: "Dataset", path: "/dashboard/dataset", icon: <Database /> },
+    { name: "Dataset", path: "/platform/dataset", icon: <Database /> },
   ];
 
   const isActivePath = (path: string) => {
@@ -26,7 +44,7 @@ export default function Sidebar() {
     <aside className="bg-[#4D5E3F] text-white w-50 min-h-screen flex flex-col py-6">
       <div className="p-3 flex flex-col h-full fixed">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-center">ITea EdgeHub</h2>
+          <h2 className="text-2xl font-bold text-center">Heading</h2>
         </div>
 
         <div className="mb-6">

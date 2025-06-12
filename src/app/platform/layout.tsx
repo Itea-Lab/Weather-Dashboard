@@ -1,9 +1,9 @@
 import { AuthProvider } from "@/context/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import Sidebar from "@/components/dashboard/Sidebar";
+import Sidebar from "@/components/platform/Sidebar";
 
 export const metadata = {
-  title: "Dashboard",
+  title: "Platform",
 };
 
 export default function DashboardLayout({
