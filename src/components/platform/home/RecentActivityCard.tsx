@@ -2,7 +2,7 @@ import Link from "next/link";
 
 interface Activity {
   id: string;
-  type: string;
+  type: "sensor" | "alert" | "device" | "platform";
   name: string;
   status?: string;
   value?: string | number;
@@ -12,34 +12,34 @@ export default function RecentActivityCard() {
   const activities = [
     {
       id: "1",
-      type: "temperature",
+      type: "sensor",
       name: "Temperature Sensor 1",
       status: "Normal",
       value: "22.5°C",
     },
     {
       id: "2",
-      type: "humidity",
+      type: "sensor",
       name: "Humidity Sensor 1",
       status: "High",
       value: "75%",
     },
     {
       id: "3",
-      type: "windSpeed",
+      type: "sensor",
       name: "Wind Speed Sensor 1",
       status: "Normal",
       value: "15 km/h",
     },
     {
-      id: "3",
-      type: "pressure",
+      id: "4",
+      type: "sensor",
       name: "Barometric Pressure Sensor 1",
       status: "Low",
       value: "1000 hPa",
     },
     {
-      id: "4",
+      id: "5",
       type: "alert",
       name: "Device Alert 1",
       status: "Critical",

@@ -1,4 +1,4 @@
-import WeatherCard from "@/components/platform/WeatherCard";
+import WeatherCard from "@/components/platform/DataCard";
 import WindChart from "@/components/platform/WindChart";
 import RainChart from "@/components/platform/RainChart";
 

@@ -184,12 +184,12 @@ docker run -d -p 3000:3000 --env-file .env.local pancakeslmao/itea-edge-hub:late
 ## Adding New Components
 To add new Shadcn/UI components to your project:
 ```bash
-pnpm dlx shadcn-ui@latest add <component-name>
+pnpm dlx shadcn@latest add <component-name>
 ```
 Examples:
 ```bash
-pnpm dlx shadcn-ui@latest add button
-pnpm dlx shadcn-ui@latest add dialog
-pnpm dlx shadcn-ui@latest add chart
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add dialog
+pnpm dlx shadcn@latest add chart
 ```
 Components will be automatically installed with their dependencies and added to the `src/app/components/ui/` directory.
