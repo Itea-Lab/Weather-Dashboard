@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider } from "@/hooks/AuthContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Sidebar from "@/components/platform/Sidebar";
 

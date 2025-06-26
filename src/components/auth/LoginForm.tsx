@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/AuthContext";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
@@ -9,7 +9,6 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

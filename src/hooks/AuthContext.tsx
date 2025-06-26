@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
+import { AUTH_CONFIG } from "@/lib/authUtils";
 
 interface AuthContextType {
   user: User | null;
@@ -25,29 +26,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in on initial load
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem("auth-token");
+        const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
         if (!token) {
           setLoading(false);
           return;
         }
 
-        const response = await fetch('/api/auth', {
-          headers: { Authorization: `Bearer ${token}` }
+        const csrfToken = localStorage.getItem(AUTH_CONFIG.CSRF_KEY);
+        const response = await fetch("/api/auth", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            [AUTH_CONFIG.CSRF_HEADER]: csrfToken || "",
+          },
         });
+
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
         } else {
-          localStorage.removeItem('auth-token');
+          localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+          localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
           setUser(null);
         }
-
       } catch (error) {
         console.error("Auth check failed:", error);
-        localStorage.removeItem("auth-token");
+        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+        localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
       } finally {
         setLoading(false);
       }
@@ -59,7 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (username: string, password: string) => {
     setLoading(true);
     try {
-      // In a real app, call your API
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: {
@@ -75,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
-      localStorage.setItem('auth-token', data.token);
-      localStorage.setItem('csrf-token', data.csrfToken);
+      localStorage.setItem(AUTH_CONFIG.TOKEN_KEY, data.token);
+      localStorage.setItem(AUTH_CONFIG.CSRF_KEY, data.csrfToken);
       setUser(data.user);
 
       router.push("/platform");
@@ -88,8 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    localStorage.removeItem("auth-token");
-    localStorage.removeItem("csrf-token");
+    localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
+    localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch (e) {
