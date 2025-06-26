@@ -1,17 +1,17 @@
 export default function DeviceFilter() {
   return (
     <div className="flex items-center space-x-4">
-      <label htmlFor="deviceType" className="text-sm font-medium">
-        Device Type:
+      <label htmlFor="group" className="text-sm font-medium">
+        Group:
       </label>
       <select
-        id="deviceType"
+        id="group"
         className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#688055]"
       >
         <option value="">All</option>
-        <option value="sensor">Sensor</option>
-        <option value="actuator">Actuator</option>
-        <option value="gateway">Gateway</option>
+        <option value="group1">Group 1</option>
+        <option value="group2">Group 2</option>
+        <option value="group3">Group 3</option>
       </select>
 
       <label htmlFor="status" className="text-sm font-medium">
@@ -22,8 +22,8 @@ export default function DeviceFilter() {
         className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#688055]"
       >
         <option value="">All</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
+        <option value="active">Online</option>
+        <option value="inactive">Offline</option>
       </select>
     </div>
   );
