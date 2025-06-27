@@ -50,9 +50,9 @@ export default function Sidebar() {
         <div className="mb-6">
           <div className="px-4 py-3 rounded-lg bg-[#688055] mb-4">
             <p className="text-sm opacity-75">Logged in as</p>
-            <p className="font-medium">{user?.name || "Loading..."}</p>
+            <p className="font-medium">{user?.username || "Loading..."}</p>
             <p className="text-sm text-[#A8CD89]">
-              {user?.email || "Loading..."}
+              {user?.signInDetails?.loginId || "Loading..."}
             </p>
           </div>
         </div>

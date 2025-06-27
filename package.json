@@ -29,6 +29,7 @@
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
+    "@aws-amplify/adapter-nextjs": "^1.6.4",
     "@aws-amplify/backend": "^1.16.1",
     "@aws-amplify/backend-cli": "^1.8.0",
     "@eslint/eslintrc": "^3",

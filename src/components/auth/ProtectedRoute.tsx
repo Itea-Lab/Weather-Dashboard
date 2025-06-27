@@ -13,6 +13,7 @@ export default function ProtectedRoute({
   const router = useRouter();
 
   useEffect(() => {
+    // Only redirect if we're done loading and there's no user
     if (!loading && !user) {
       router.push("/");
     }

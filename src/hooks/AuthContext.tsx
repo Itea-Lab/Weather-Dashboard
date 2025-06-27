@@ -1,3 +1,4 @@
+// src/hooks/AuthContext.tsx
 "use client";
 
 import {
@@ -8,104 +9,104 @@ import {
   ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "@/types/user";
-import { AUTH_CONFIG } from "@/lib/authUtils";
+import {
+  AuthUser,
+  getCurrentUser,
+  signIn,
+  signOut,
+  confirmSignIn,
+} from "aws-amplify/auth";
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
+  needsPasswordChange: boolean;
+  completePasswordChange: (newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem(AUTH_CONFIG.TOKEN_KEY);
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        const csrfToken = localStorage.getItem(AUTH_CONFIG.CSRF_KEY);
-        const response = await fetch("/api/auth", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            [AUTH_CONFIG.CSRF_HEADER]: csrfToken || "",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
-        } else {
-          localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
-          localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
-        localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     checkAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
-    setLoading(true);
+  const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Login failed");
-      }
-
-      const data = await response.json();
-      localStorage.setItem(AUTH_CONFIG.TOKEN_KEY, data.token);
-      localStorage.setItem(AUTH_CONFIG.CSRF_KEY, data.csrfToken);
-      setUser(data.user);
-
-      router.push("/platform");
-    } catch (error) {
-      throw error;
+      // Small delay to ensure Amplify is fully initialized
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch {
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = async () => {
-    localStorage.removeItem(AUTH_CONFIG.TOKEN_KEY);
-    localStorage.removeItem(AUTH_CONFIG.CSRF_KEY);
+  const login = async (email: string, password: string) => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } catch (e) {
-      console.error("Error during logout:", e);
+      // You may ask why its username but not email here, check AuthSignInInput<ServiceOptions> API documentation
+      // https://aws-amplify.github.io/amplify-js/api/interfaces/aws_amplify.auth._Reference_Types_.AuthSignInInput.html
+      const result = await signIn({ username: email, password });
+
+      if (
+        result.nextStep?.signInStep ===
+        "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
+      ) {
+        setNeedsPasswordChange(true);
+        return;
+      }
+
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      router.push("/platform");
+    } catch (error) {
+      throw error;
     }
-    setUser(null);
-    router.push("/");
+  };
+
+  const logout = async () => {
+    try {
+      await signOut();
+      setUser(null);
+      setNeedsPasswordChange(false);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const completePasswordChange = async (newPassword: string) => {
+    try {
+      await confirmSignIn({ challengeResponse: newPassword });
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      setNeedsPasswordChange(false);
+      router.push("/platform");
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        needsPasswordChange,
+        completePasswordChange,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -113,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
