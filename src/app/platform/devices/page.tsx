@@ -13,6 +13,7 @@ export default function DevicesPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h1 className="text-3xl font-bold">Devices</h1>
       </div>
+
       {/* Device actions */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-6">
@@ -21,14 +22,18 @@ export default function DevicesPage() {
           </div>
         </div>
       </div>
-      {/* Device status card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> 
+
+      {/* Device status cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <DeviceStatusCard title="Total Devices" icon="all" />
         <DeviceStatusCard title="Online Devices" icon="online" />
         <DeviceStatusCard title="Offline Devices" icon="offline" />
       </div>
-      {/* Device list */}
-      <DeviceTable />
+
+      {/* Device table with filter - wrapped in page container */}
+      <div className="w-full">
+        <DeviceTable />
+      </div>
     </div>
   );
 }

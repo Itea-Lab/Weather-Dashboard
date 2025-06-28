@@ -40,11 +40,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      // Small delay to ensure Amplify is fully initialized
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    } catch {
+      // Wait for Amplify to be properly initialized with exponential backoff
+      const waitForAmplifyInit = async (maxRetries = 10, baseDelay = 50) => {
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+          try {
+            // Try to get current user - if Amplify is initialized, this should work or throw a meaningful error
+            const currentUser = await getCurrentUser();
+            return currentUser;
+          } catch (error: any) {
+            // Check if this is an initialization error vs authentication error
+            const errorMessage = error?.message || "";
+            const isInitError =
+              errorMessage.includes("not configured") ||
+              errorMessage.includes("not initialized") ||
+              errorMessage.includes("Amplify has not been configured");
+
+            if (!isInitError) {
+              // This is likely a legitimate auth error (user not signed in), not an init issue
+              throw error;
+            }
+
+            // If it's an init error and we haven't reached max retries, wait and try again
+            if (attempt < maxRetries - 1) {
+              const delay = baseDelay * Math.pow(2, attempt); // Exponential backoff
+              await new Promise((resolve) => setTimeout(resolve, delay));
+              continue;
+            }
+
+            // Max retries reached, throw the error
+            throw error;
+          }
+        }
+      };
+
+      const currentUser = await waitForAmplifyInit();
+      setUser(currentUser || null);
+    } catch (error) {
+      // User is not authenticated or Amplify failed to initialize
       setUser(null);
     } finally {
       setLoading(false);
