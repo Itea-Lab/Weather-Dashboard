@@ -2,7 +2,7 @@
 FROM node:22-alpine AS base
 LABEL author="PancakesLmao <phucthin29@gmail.com>"
 LABEL description="Dockerfile for Nextjs weather dashboard"
-LABEL version="1.0"
+LABEL version="1.1"
 
 # Set the working directory
 WORKDIR /app
