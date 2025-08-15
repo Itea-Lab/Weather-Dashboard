@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm fetch && pnpm install --frozen-lockfile
 
 FROM deps AS build
-COPY next.config.ts tsconfig.json ./
+COPY next.config.ts tsconfig.json postcss.config.mjs ./
 COPY src ./src
 COPY public ./public
 # Cache Next.js build
