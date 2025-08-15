@@ -1,45 +1,44 @@
-# BASE IMAGE
-FROM node:22-alpine AS base
+# syntax=docker/dockerfile:1.7
+FROM node:20-alpine AS base
 LABEL author="PancakesLmao <phucthin29@gmail.com>"
-LABEL description="Dockerfile for Nextjs weather dashboard"
-LABEL version="1.1"
+LABEL description="Dockerfile for Next.js weather dashboard"
+LABEL version="1.3"
 
-# Set the working directory
 WORKDIR /app
 
-# Install git n pnpm globally
-RUN apk add --no-cache git
-RUN npm install -g pnpm
+# Use corepack to activate pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
-# INSTALL dependencies
 FROM base AS deps
-# Copy package.json and pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
-# Install dependencies using pnpm
-RUN pnpm install --frozen-lockfile
+# Cache pnpm store and prefetch dependencies
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm fetch && pnpm install --frozen-lockfile
 
-# BUILD the application
 FROM deps AS build
-# Copy the source code
-COPY . .
-# Build the application
-RUN pnpm run build   
+COPY next.config.ts tsconfig.json ./
+COPY src ./src
+COPY public ./public
+# Cache Next.js build
+RUN --mount=type=cache,target=/app/.next/cache \
+    pnpm run build
 
-# PRODUCTION IMAGE
-FROM node:22-alpine AS prod
+FROM node:20-alpine AS prod
 WORKDIR /app
 ENV NODE_ENV=production
-# Install only production dependencies
-COPY package.json pnpm-lock.yaml ./
-RUN apk add --no-cache git && npm install -g pnpm && pnpm install --prod --frozen-lockfile
 
-# Copy built app
+# Activate pnpm via corepack for prod
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+COPY package.json pnpm-lock.yaml ./
+# Cache pnpm store for prod install
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm fetch && pnpm install --prod --frozen-lockfile
+
+# Copy only necessary files from build stage
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
-COPY --from=build /app/src ./src
 COPY --from=build /app/next.config.ts ./next.config.ts
-COPY --from=build /app/src/middleware.ts ./middleware.ts
-COPY --from=build /app/tsconfig.json ./tsconfig.json
 
 EXPOSE 3000
 CMD ["pnpm", "start"]
